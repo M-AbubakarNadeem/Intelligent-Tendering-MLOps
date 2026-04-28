@@ -17,7 +17,7 @@ def test_sinsent_model():
     input_ids = torch.randint(0, 100, (2, 16))
     attention_mask = torch.ones(2, 16)
     outputs = model(input_ids, attention_mask)
-    assert outputs.shape == (2, NUM_LABELS)
+    assert outputs["logits"].shape == (2, NUM_LABELS)
 
 
 def test_seqsent_model():
@@ -29,4 +29,4 @@ def test_seqsent_model():
     attention_mask = torch.ones(2, 3, 16)
     num_sentences = torch.tensor([3, 2])
     outputs = model(input_ids, attention_mask, num_sentences=num_sentences)
-    assert outputs.shape == (2, 3, NUM_LABELS)
+    assert outputs["logits"].shape == (2, 3, NUM_LABELS)
