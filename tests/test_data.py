@@ -9,7 +9,7 @@ from src.data.preprocess import parse_pubmed_rct, SinSentDataset  # noqa: E402
 
 def test_parse_pubmed_rct(tmp_path):
     # Create a small dummy file
-    content = "### 123\nLABEL\tSentence 1.\nLABEL\tSentence 2.\n"
+    content = "### 123\nMETHODS\tSentence 1.\nRESULTS\tSentence 2.\n"
     d = tmp_path / "sub"
     d.mkdir()
     f = d / "test.txt"

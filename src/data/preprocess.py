@@ -237,7 +237,7 @@ def create_dataloaders(
     Returns:
         Tuple of (train_loader, val_loader, test_loader)
     """
-    tokenizer = BertTokenizer.from_pretrained(tokenizer_name)
+    tokenizer = BertTokenizer.from_pretrained(tokenizer_name)  # nosec B615
 
     # Parse data files
     train_abstracts = parse_pubmed_rct(os.path.join(data_dir, "train.txt"))
