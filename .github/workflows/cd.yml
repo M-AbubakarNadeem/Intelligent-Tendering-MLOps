@@ -7,6 +7,7 @@ on:
       - 'src/**'
       - 'Dockerfile'
       - 'requirements.txt'
+      - '.github/workflows/cd.yml'
 
 jobs:
   # ─── Build & Test Docker Image ──────────────────────────────
