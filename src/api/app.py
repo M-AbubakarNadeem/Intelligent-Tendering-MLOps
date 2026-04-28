@@ -82,7 +82,9 @@ def load_model_from_checkpoint():
 
     logger.info(f"Loading {target_type} model from {checkpoint_path}...")
 
-    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)  # nosec B614
+    checkpoint = torch.load(  # nosec B614
+        checkpoint_path, map_location=device, weights_only=False
+    )
     saved_args = checkpoint["args"]
 
     if target_type == "sinsent":
@@ -103,7 +105,9 @@ def load_model_from_checkpoint():
     model.eval()
     model_type = target_type
 
-    tokenizer = BertTokenizer.from_pretrained(saved_args.get("model_name", model_name))  # nosec B615
+    tokenizer = BertTokenizer.from_pretrained(  # nosec B615
+        saved_args.get("model_name", model_name)
+    )
 
     MODEL_LOADED.labels(model_type=model_type).set(1)
     logger.info(f"Model loaded successfully! Type: {model_type}, Device: {device}")

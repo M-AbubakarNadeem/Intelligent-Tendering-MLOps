@@ -44,7 +44,9 @@ def load_model(model_type, device):
         print(f"WARNING: {checkpoint_path} not found!")
         return None, None
 
-    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)  # nosec B614
+    checkpoint = torch.load(  # nosec B614
+        checkpoint_path, map_location=device, weights_only=False
+    )
     saved_args = checkpoint["args"]
 
     if model_type == "sinsent":
@@ -62,6 +64,7 @@ def load_model(model_type, device):
 
     model.load_state_dict(checkpoint["model_state_dict"])
     model = model.to(device)
+    model.eval()
     return model, saved_args
 
 
@@ -310,9 +313,9 @@ def compare_models(args):
     )
 
     # Print comparison table
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("RESULTS COMPARISON")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     print(f"{'Metric':<25} {'SinSent':>10} {'SeqSent':>10} {'Δ':>10}")
     print("-" * 55)
     for metric in [
@@ -328,9 +331,9 @@ def compare_models(args):
         print(f"  {metric:<23} {s:>10.4f} {q:>10.4f} {delta:>+10.4f}")
 
     # Parameter comparison
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("MODEL PARAMETERS")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     sin_params = count_parameters(sinsent_model)
     seq_params = count_parameters(seqsent_model)
     print(
@@ -341,9 +344,9 @@ def compare_models(args):
     )
 
     # Latency benchmarking
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("LATENCY BENCHMARKING")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     sinsent_latency = benchmark_latency(
         sinsent_model, sinsent_test_loader, device, "sinsent"
     )
@@ -358,9 +361,9 @@ def compare_models(args):
     )
 
     # Generate plots
-    print(f"\n{'='*60}")
+    print(f"\n{'=' * 60}")
     print("GENERATING PLOTS")
-    print(f"{'='*60}")
+    print(f"{'=' * 60}")
     plot_metric_comparison(sinsent_metrics, seqsent_metrics, output_dir)
     plot_confusion_matrices(
         sinsent_preds, sinsent_labels, seqsent_preds, seqsent_labels, output_dir
