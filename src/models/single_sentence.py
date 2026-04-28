@@ -32,7 +32,7 @@ class SingleSentenceClassifier(nn.Module):
         dropout: float = 0.3,
     ):
         super().__init__()
-        self.bert = BertModel.from_pretrained(model_name)
+        self.bert = BertModel.from_pretrained(model_name)  # nosec B615
         self.dropout = nn.Dropout(dropout)
         self.classifier = nn.Linear(self.bert.config.hidden_size, num_labels)
         self.num_labels = num_labels

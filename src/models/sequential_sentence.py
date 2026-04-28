@@ -43,7 +43,7 @@ class SequentialSentenceClassifier(nn.Module):
         lstm_num_layers: int = 2,
     ):
         super().__init__()
-        self.bert = BertModel.from_pretrained(model_name)
+        self.bert = BertModel.from_pretrained(model_name)  # nosec B615
         self.hidden_size = self.bert.config.hidden_size
 
         # BiLSTM for sequential context

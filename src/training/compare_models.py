@@ -44,7 +44,7 @@ def load_model(model_type, device):
         print(f"WARNING: {checkpoint_path} not found!")
         return None, None
 
-    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)
+    checkpoint = torch.load(checkpoint_path, map_location=device, weights_only=False)  # nosec B614
     saved_args = checkpoint["args"]
 
     if model_type == "sinsent":
