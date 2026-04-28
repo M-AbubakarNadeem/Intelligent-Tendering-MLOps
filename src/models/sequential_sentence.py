@@ -57,7 +57,9 @@ class SequentialSentenceClassifier(nn.Module):
         )
 
         self.dropout = nn.Dropout(dropout)
-        self.classifier = nn.Linear(lstm_hidden_size * 2, num_labels)  # *2 for bidirectional
+        self.classifier = nn.Linear(
+            lstm_hidden_size * 2, num_labels
+        )  # *2 for bidirectional
         self.num_labels = num_labels
 
     def forward(self, input_ids, attention_mask, labels=None, num_sentences=None):
@@ -102,7 +104,9 @@ class SequentialSentenceClassifier(nn.Module):
 
         # Process sequence of sentence embeddings with BiLSTM
         # This is where context from surrounding sentences is captured
-        lstm_output, _ = self.lstm(sentence_embeddings)  # (batch, max_sent, lstm_hidden*2)
+        lstm_output, _ = self.lstm(
+            sentence_embeddings
+        )  # (batch, max_sent, lstm_hidden*2)
 
         lstm_output = self.dropout(lstm_output)
         logits = self.classifier(lstm_output)  # (batch, max_sent, num_labels)

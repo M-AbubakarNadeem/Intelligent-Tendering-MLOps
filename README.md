@@ -1,6 +1,6 @@
 # Intelligent Tendering: Sequential Classification for RFQ Documents
 
-> **MLOps Project — Track I: Analysis-Based Research**
+> **MLOps Project - Track I: Analysis-Based Research**
 > 
 > An end-to-end MLOps pipeline implementing and comparing two NLP classification approaches (Single Sentence vs Sequential Sentence) based on the paper *"Leveraging MLOps: Developing a Sequential Classification System for RFQ Documents in Electrical Engineering"*.
 
@@ -251,7 +251,9 @@ Based on: *"Leveraging MLOps: Developing a Sequential Classification System for 
 
 ## 👤 Author
 
-**Muhammad Abubakar** — i222003  
+**Muhammad Abubakar Nadeem** — i222003  
+**Ayaan Khan** — i222066  
+**Sahil Kumar** — i222048  
 FAST National University — Semester 8, MLOps Course
 
 ---

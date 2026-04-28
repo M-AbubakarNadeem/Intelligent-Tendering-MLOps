@@ -27,7 +27,7 @@ jobs:
         run: black --check --diff src/ tests/
 
       - name: Lint with Flake8
-        run: flake8 src/ tests/ --max-line-length=120 --statistics
+        run: flake8 src/ tests/ --max-line-length=120 --statistics --ignore=E203,E226,W503,W504
 
   # ─── Code Tests ─────────────────────────────────────────────
   test:

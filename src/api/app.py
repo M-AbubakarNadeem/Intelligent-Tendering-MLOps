@@ -11,7 +11,6 @@ This corresponds to the paper's Flask-based container serving the ML solution.
 
 import os
 import sys
-import json
 import time
 import torch
 import logging
@@ -28,9 +27,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from src.models.single_sentence import SingleSentenceClassifier
-from src.models.sequential_sentence import SequentialSentenceClassifier
-from src.data.preprocess import NUM_LABELS, ID_TO_LABEL
+from src.models.single_sentence import SingleSentenceClassifier  # noqa: E402
+from src.models.sequential_sentence import SequentialSentenceClassifier  # noqa: E402
+from src.data.preprocess import NUM_LABELS, ID_TO_LABEL  # noqa: E402
 
 # Logging
 logging.basicConfig(level=logging.INFO)
@@ -104,9 +103,7 @@ def load_model_from_checkpoint():
     model.eval()
     model_type = target_type
 
-    tokenizer = BertTokenizer.from_pretrained(
-        saved_args.get("model_name", model_name)
-    )
+    tokenizer = BertTokenizer.from_pretrained(saved_args.get("model_name", model_name))
 
     MODEL_LOADED.labels(model_type=model_type).set(1)
     logger.info(f"Model loaded successfully! Type: {model_type}, Device: {device}")
@@ -116,12 +113,14 @@ def load_model_from_checkpoint():
 @app.route("/health", methods=["GET"])
 def health():
     """Health check endpoint."""
-    return jsonify({
-        "status": "healthy",
-        "model_loaded": model is not None,
-        "model_type": model_type,
-        "device": str(device),
-    })
+    return jsonify(
+        {
+            "status": "healthy",
+            "model_loaded": model is not None,
+            "model_type": model_type,
+            "device": str(device),
+        }
+    )
 
 
 @app.route("/predict", methods=["POST"])
@@ -160,17 +159,17 @@ def predict():
         REQUEST_LATENCY.labels(model_type=model_type).observe(latency)
 
         for r in results:
-            PREDICTION_CONFIDENCE.labels(model_type=model_type).observe(
-                r["confidence"]
-            )
+            PREDICTION_CONFIDENCE.labels(model_type=model_type).observe(r["confidence"])
 
         ACTIVE_REQUESTS.dec()
 
-        return jsonify({
-            "model_type": model_type,
-            "predictions": results,
-            "latency_ms": round(latency * 1000, 2),
-        })
+        return jsonify(
+            {
+                "model_type": model_type,
+                "predictions": results,
+                "latency_ms": round(latency * 1000, 2),
+            }
+        )
 
     except Exception as e:
         ACTIVE_REQUESTS.dec()
@@ -197,14 +196,16 @@ def _predict_sinsent(sentences, max_len):
         probs = torch.softmax(outputs["logits"], dim=-1).cpu().numpy()[0]
         pred_class = int(probs.argmax())
 
-        results.append({
-            "sentence": sent,
-            "predicted_label": ID_TO_LABEL[pred_class],
-            "confidence": round(float(probs[pred_class]), 4),
-            "all_probabilities": {
-                ID_TO_LABEL[i]: round(float(p), 4) for i, p in enumerate(probs)
-            },
-        })
+        results.append(
+            {
+                "sentence": sent,
+                "predicted_label": ID_TO_LABEL[pred_class],
+                "confidence": round(float(probs[pred_class]), 4),
+                "all_probabilities": {
+                    ID_TO_LABEL[i]: round(float(p), 4) for i, p in enumerate(probs)
+                },
+            }
+        )
     return results
 
 
@@ -226,8 +227,12 @@ def _predict_seqsent(sentences, max_len):
         attention_mask_list.append(encoding["attention_mask"])
 
     # Stack into batch with sequence dimension
-    input_ids = torch.stack([t.squeeze(0) for t in input_ids_list]).unsqueeze(0).to(device)
-    attention_mask = torch.stack([t.squeeze(0) for t in attention_mask_list]).unsqueeze(0).to(device)
+    input_ids = (
+        torch.stack([t.squeeze(0) for t in input_ids_list]).unsqueeze(0).to(device)
+    )
+    attention_mask = (
+        torch.stack([t.squeeze(0) for t in attention_mask_list]).unsqueeze(0).to(device)
+    )
     num_sentences = torch.tensor([len(sentences)])
 
     outputs = model(input_ids, attention_mask, num_sentences=num_sentences)
@@ -237,14 +242,16 @@ def _predict_seqsent(sentences, max_len):
     results = []
     for i, sent in enumerate(sentences):
         pred_class = int(probs[i].argmax())
-        results.append({
-            "sentence": sent,
-            "predicted_label": ID_TO_LABEL[pred_class],
-            "confidence": round(float(probs[i][pred_class]), 4),
-            "all_probabilities": {
-                ID_TO_LABEL[j]: round(float(p), 4) for j, p in enumerate(probs[i])
-            },
-        })
+        results.append(
+            {
+                "sentence": sent,
+                "predicted_label": ID_TO_LABEL[pred_class],
+                "confidence": round(float(probs[i][pred_class]), 4),
+                "all_probabilities": {
+                    ID_TO_LABEL[j]: round(float(p), 4) for j, p in enumerate(probs[i])
+                },
+            }
+        )
     return results
 
 
@@ -257,15 +264,17 @@ def metrics():
 @app.route("/", methods=["GET"])
 def index():
     """Root endpoint with API info."""
-    return jsonify({
-        "name": "Intelligent Tendering Classification API",
-        "version": "1.0.0",
-        "endpoints": {
-            "/predict": "POST - Classify sentences",
-            "/health": "GET - Health check",
-            "/metrics": "GET - Prometheus metrics",
-        },
-    })
+    return jsonify(
+        {
+            "name": "Intelligent Tendering Classification API",
+            "version": "1.0.0",
+            "endpoints": {
+                "/predict": "POST - Classify sentences",
+                "/health": "GET - Health check",
+                "/metrics": "GET - Prometheus metrics",
+            },
+        }
+    )
 
 
 # Load model on startup

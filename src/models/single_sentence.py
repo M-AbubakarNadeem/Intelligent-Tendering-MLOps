@@ -11,7 +11,6 @@ Architecture:
     Input sentence → BERT → [CLS] token → Dropout → Linear → Class logits
 """
 
-import torch
 import torch.nn as nn
 from transformers import BertModel
 
