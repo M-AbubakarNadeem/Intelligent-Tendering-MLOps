@@ -1,0 +1,27 @@
+# ─── Python Environment ──────────────────────────────────────
+venv/
+.env
+__pycache__/
+*.py[cod]
+*$py.class
+
+# ─── Data & Models (Heavy Files) ─────────────────────────────
+data/
+models/*.pt
+mlruns/
+results/
+
+# ─── User Specific Exclusions ────────────────────────────────
+extracted_text.txt
+guidelines_text.txt
+"i222003 Muhammad Abubakar - MLOps -- Project Statement.pdf"
+Intelligent_Tendering_ACL_general_template.pdf
+
+# ─── IDE & OS ────────────────────────────────────────────────
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# ─── Docker ──────────────────────────────────────────────────
+*.log

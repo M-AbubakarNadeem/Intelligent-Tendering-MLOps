@@ -1,0 +1,54 @@
+groups:
+  - name: ml_api_alerts
+    rules:
+      # Alert if API is down for more than 1 minute
+      - alert: APIDown
+        expr: up{job="ml-api"} == 0
+        for: 1m
+        labels:
+          severity: critical
+        annotations:
+          summary: "ML API is down"
+          description: "The ML API service has been unreachable for more than 1 minute."
+
+      # Alert if prediction latency exceeds 5 seconds
+      - alert: HighLatency
+        expr: histogram_quantile(0.95, rate(prediction_latency_seconds_bucket{job="ml-api"}[5m])) > 5
+        for: 2m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High prediction latency detected"
+          description: "95th percentile prediction latency is above 5 seconds."
+
+      # Alert if error rate exceeds 10%
+      - alert: HighErrorRate
+        expr: |
+          rate(prediction_requests_total{status="error"}[5m])
+          / rate(prediction_requests_total[5m]) > 0.1
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "High prediction error rate"
+          description: "More than 10% of predictions are failing."
+
+      # Alert if low prediction confidence
+      - alert: LowConfidence
+        expr: histogram_quantile(0.5, rate(prediction_confidence_bucket{job="ml-api"}[10m])) < 0.5
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Low model prediction confidence"
+          description: "Median prediction confidence has dropped below 0.5, indicating potential model drift."
+
+      # Alert if no model is loaded
+      - alert: ModelNotLoaded
+        expr: model_loaded == 0
+        for: 2m
+        labels:
+          severity: critical
+        annotations:
+          summary: "No ML model loaded"
+          description: "The API service has no model loaded for inference."

@@ -1,0 +1,29 @@
+# Core ML
+torch>=2.0.0
+transformers>=4.30.0
+datasets>=2.14.0
+
+# MLOps
+mlflow>=2.5.0
+
+# API
+flask>=2.3.0
+gunicorn>=21.2.0
+prometheus-client>=0.17.0
+
+# Data & Evaluation
+scikit-learn>=1.3.0
+pandas>=2.0.0
+numpy>=1.24.0
+tqdm>=4.65.0
+requests>=2.31.0
+
+# Visualization
+matplotlib>=3.7.0
+seaborn>=0.12.0
+
+# Testing & Quality
+pytest>=7.4.0
+flake8>=6.1.0
+black>=23.7.0
+bandit>=1.7.0

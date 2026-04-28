@@ -1,0 +1,69 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  # ─── Formatting & Linting ───────────────────────────────────
+  lint:
+    name: Formatting & Linting
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install flake8 black
+
+      - name: Check formatting with Black
+        run: black --check --diff src/ tests/
+
+      - name: Lint with Flake8
+        run: flake8 src/ tests/ --max-line-length=120 --statistics
+
+  # ─── Code Tests ─────────────────────────────────────────────
+  test:
+    name: Code Tests
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+
+      - name: Run unit tests
+        run: pytest tests/ -v --tb=short
+
+  # ─── Security Tests ─────────────────────────────────────────
+  security:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    needs: lint
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install Bandit
+        run: pip install bandit
+
+      - name: Run security scan
+        run: bandit -r src/ -ll --skip B101

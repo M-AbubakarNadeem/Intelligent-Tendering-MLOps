@@ -1,0 +1,175 @@
+name: ML Pipeline
+
+on:
+  workflow_dispatch:
+    inputs:
+      model_type:
+        description: 'Model to train (sinsent/seqsent/both)'
+        required: true
+        default: 'both'
+        type: choice
+        options:
+          - sinsent
+          - seqsent
+          - both
+      epochs:
+        description: 'Number of training epochs'
+        required: false
+        default: '5'
+      max_samples:
+        description: 'Max training samples (empty for full dataset)'
+        required: false
+        default: '500'
+
+jobs:
+  # ─── Download Data ──────────────────────────────────────────
+  download-data:
+    name: Download Dataset
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install requests
+
+      - name: Download PubMed RCT dataset
+        run: python src/data/download_data.py --data_dir data/raw
+
+      - name: Upload data artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: dataset
+          path: data/raw/
+
+  # ─── Train SinSent ──────────────────────────────────────────
+  train-sinsent:
+    name: Train SinSent Model
+    runs-on: ubuntu-latest
+    needs: download-data
+    if: ${{ github.event.inputs.model_type == 'sinsent' || github.event.inputs.model_type == 'both' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download data artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dataset
+          path: data/raw/
+
+      - name: Train SinSent model
+        run: |
+          python src/training/train.py \
+            --model_type sinsent \
+            --epochs ${{ github.event.inputs.epochs }} \
+            --batch_size 32 \
+            --learning_rate 1e-05 \
+            --dropout 0.3 \
+            --max_samples ${{ github.event.inputs.max_samples }}
+
+      - name: Upload model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: sinsent-model
+          path: |
+            models/
+            results/
+            mlruns/
+
+  # ─── Train SeqSent ──────────────────────────────────────────
+  train-seqsent:
+    name: Train SeqSent Model
+    runs-on: ubuntu-latest
+    needs: download-data
+    if: ${{ github.event.inputs.model_type == 'seqsent' || github.event.inputs.model_type == 'both' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download data artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: dataset
+          path: data/raw/
+
+      - name: Train SeqSent model
+        run: |
+          python src/training/train.py \
+            --model_type seqsent \
+            --epochs ${{ github.event.inputs.epochs }} \
+            --batch_size 8 \
+            --learning_rate 5e-06 \
+            --dropout 0.1 \
+            --max_samples ${{ github.event.inputs.max_samples }}
+
+      - name: Upload model artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: seqsent-model
+          path: |
+            models/
+            results/
+            mlruns/
+
+  # ─── Compare Models ─────────────────────────────────────────
+  compare:
+    name: Compare Models
+    runs-on: ubuntu-latest
+    needs: [train-sinsent, train-seqsent]
+    if: ${{ github.event.inputs.model_type == 'both' }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -r requirements.txt
+
+      - name: Download SinSent model
+        uses: actions/download-artifact@v4
+        with:
+          name: sinsent-model
+          path: .
+
+      - name: Download SeqSent model
+        uses: actions/download-artifact@v4
+        with:
+          name: seqsent-model
+          path: .
+
+      - name: Download data
+        uses: actions/download-artifact@v4
+        with:
+          name: dataset
+          path: data/raw/
+
+      - name: Run model comparison
+        run: python src/training/compare_models.py --max_samples ${{ github.event.inputs.max_samples }}
+
+      - name: Upload comparison results
+        uses: actions/upload-artifact@v4
+        with:
+          name: comparison-results
+          path: results/
