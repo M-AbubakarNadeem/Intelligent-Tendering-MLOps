@@ -19,6 +19,9 @@ jobs:
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
 
+      - name: Create empty models directory
+        run: mkdir -p models
+
       - name: Build Docker image
         run: |
           docker build -t intelligent-tendering-api:latest .
