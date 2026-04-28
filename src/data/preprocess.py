@@ -17,7 +17,6 @@ from torch.utils.data import Dataset, DataLoader
 from transformers import BertTokenizer
 from typing import List, Dict, Tuple
 
-
 # Label mapping for PubMed RCT
 LABEL_MAP = {
     "BACKGROUND": 0,

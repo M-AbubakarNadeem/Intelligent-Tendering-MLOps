@@ -14,7 +14,6 @@ import requests
 import argparse
 from pathlib import Path
 
-
 # PubMed 20k RCT dataset URLs (smaller version for faster experiments)
 BASE_URL = (
     "https://raw.githubusercontent.com/Franck-Dernoncourt/pubmed-rct/master/"
@@ -83,9 +82,7 @@ def verify_dataset(data_dir: str = "data/raw") -> dict:
         n_sentences = sum(
             1
             for line in lines
-            if line.strip()
-            and not line.startswith("###")
-            and "\t" in line
+            if line.strip() and not line.startswith("###") and "\t" in line
         )
 
         # Count labels
