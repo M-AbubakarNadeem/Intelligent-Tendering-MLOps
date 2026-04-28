@@ -22,7 +22,11 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from src.data.preprocess import create_dataloaders, NUM_LABELS, ID_TO_LABEL  # noqa: E402
+from src.data.preprocess import (  # noqa: E402
+    create_dataloaders,
+    NUM_LABELS,
+    ID_TO_LABEL,
+)
 from src.models.single_sentence import SingleSentenceClassifier  # noqa: E402
 from src.models.sequential_sentence import SequentialSentenceClassifier  # noqa: E402
 from src.models.utils import (  # noqa: E402
